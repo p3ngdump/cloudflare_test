@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { cn } from './utils'
-
 type Variant = 'solid'|'outline'|'subtle'
 export function Button({ className, variant='solid', ...props }:
   React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant }){

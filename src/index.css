@@ -5,4 +5,5 @@
 html, body, #root { height: 100%; }
 body { @apply bg-slate-50; }
 .badge { @apply px-2.5 py-1 rounded-full text-xs font-semibold; }
-.grid-legend { @apply text-[11px] text-slate-500; }
+.small { @apply text-[11px] text-slate-400; }
+.section { @apply rounded-3xl border border-slate-200 bg-white shadow-sm; }
