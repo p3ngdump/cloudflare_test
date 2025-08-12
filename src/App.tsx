@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { ResultCard } from '@/components/ResultCard'
 import { resultDict, Lean } from '@/data/results'
-import { RotateCcw, ChevronRight, Sparkles } from 'lucide-react'
+import { RotateCcw, ChevronRight } from 'lucide-react'
 import { GenderToggle, Gender } from '@/components/GenderToggle'
 
 const choices = [
@@ -65,14 +65,11 @@ export default function App(){
 
   return (
     <div className="min-h-screen">
-      {/* HERO */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-egen-50 via-white to-teto-50" />
         <div className="relative mx-auto max-w-5xl px-4 py-10">
           <motion.div initial={{opacity:0,y:12}} animate={{opacity:1,y:0}}>
-            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">
-              테토/에겐 연애 성향 테스트
-            </h1>
+            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">테토/에겐 연애 성향 테스트</h1>
             <p className="mt-3 text-slate-600">20문항에 답하고, 결과 일러스트 카드로 저장해 보세요.</p>
           </motion.div>
         </div>
