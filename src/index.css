@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-:root { --pink: #ff4da2; --blue:#2563eb; }
 html, body, #root { height: 100%; }
-body { @apply bg-gradient-to-br from-egen-50 via-white to-teto-50; font-family: 'Pretendard', ui-sans-serif, system-ui; }
+body { @apply bg-slate-50; }
 .badge { @apply px-2.5 py-1 rounded-full text-xs font-semibold; }

@@ -39,7 +39,7 @@ const rawQuestions = [
   { text: '상대의 잦은 확인 요청이나 보고는 다소 피곤하다.', type: 'teto' },
 ] as const
 
-function mapScore(v:number){ return v-3 } // -2..+2
+function mapScore(v:number){ return v-3 }
 function computeLean(answers:Record<number,number>){
   let sum=0; const answered = Object.keys(answers).length
   rawQuestions.forEach((q,i)=>{ const v=answers[i]; if(v==null) return; const base=mapScore(v); sum += q.type==='egen'? base: -base })
@@ -70,13 +70,10 @@ export default function App(){
         <div className="absolute inset-0 bg-gradient-to-br from-egen-50 via-white to-teto-50" />
         <div className="relative mx-auto max-w-5xl px-4 py-10">
           <motion.div initial={{opacity:0,y:12}} animate={{opacity:1,y:0}}>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border text-egen-600 border-egen-200 font-semibold shadow-sm">
-              <Sparkles className="w-4 h-4"/> 테토/에겐 연애 성향 테스트 V2
-            </div>
-            <h1 className="mt-3 text-4xl md:text-5xl font-extrabold tracking-tight">
-              핑크/블루 테마 & 귀여운 일러스트로 <br className="hidden md:block"/>내 연애 성향을 예쁘게 기록해요
+            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">
+              테토/에겐 연애 성향 테스트
             </h1>
-            <p className="mt-3 text-slate-600">20문항에 답하고, 결과 이미지를 카드로 저장해 SNS에 공유해 보세요.</p>
+            <p className="mt-3 text-slate-600">20문항에 답하고, 결과 일러스트 카드로 저장해 보세요.</p>
           </motion.div>
         </div>
       </div>
@@ -88,7 +85,7 @@ export default function App(){
             <GenderToggle value={gender} onChange={setGender} />
             <div className="flex items-center gap-3">
               <div className="text-sm text-slate-600">진행도</div>
-              <Progress value={progress} color={lean==='egen'?'var(--pink)':lean==='teto'?'var(--blue)':'black'} />
+              <Progress value={progress} />
               <div className="text-sm tabular-nums text-slate-600">{progress}%</div>
             </div>
           </CardContent>
@@ -105,7 +102,7 @@ export default function App(){
                     <div className="mt-3 grid grid-cols-2 sm:grid-cols-5 gap-2">
                       {choices.map(c=>(
                         <Button key={c.value}
-                          variant={answers[i]===c.value ? (q.type==='egen'?'pink':'blue') : 'outline'}
+                          variant={answers[i]===c.value ? 'solid':'outline'}
                           className="w-full"
                           onClick={()=>setAnswer(i,c.value)}>{c.label}</Button>
                       ))}
@@ -116,9 +113,7 @@ export default function App(){
             </Card>
           ))}
           <div className="flex gap-2 pt-2">
-            <Button onClick={onSubmit} className={`gap-2 ${lean==='egen'?'bg-egen-500 hover:bg-egen-600':'bg-teto-500 hover:bg-teto-600'}`}>
-              결과 보기 <ChevronRight className="w-4 h-4"/>
-            </Button>
+            <Button onClick={onSubmit} className="gap-2">결과 보기 <ChevronRight className="w-4 h-4"/></Button>
             <Button variant="outline" onClick={reset} className="gap-2"><RotateCcw className="w-4 h-4"/>다시 하기</Button>
           </div>
         </form>

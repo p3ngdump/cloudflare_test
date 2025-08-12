@@ -1,14 +1,13 @@
 import * as React from 'react'
 import html2canvas from 'html2canvas'
 import { resultDict, Lean } from '@/data/results'
-import { Avatar } from './Avatar'
 import { Button } from './ui/button'
 import { Share2, Download } from 'lucide-react'
+import ResultIllustration from './ResultIllustration'
 
 export function ResultCard({ lean, pct, gender }: { lean: Lean; pct: number; gender: 'male'|'female'|'none' }){
   const ref = React.useRef<HTMLDivElement>(null)
   const copy = resultDict[lean]
-  const theme = lean==='egen' ? 'pink' : lean==='teto' ? 'blue' : 'slate'
   async function capture(){
     if(!ref.current) return
     const canvas = await html2canvas(ref.current as HTMLElement, {backgroundColor: '#ffffff', scale: 2})
@@ -23,19 +22,19 @@ export function ResultCard({ lean, pct, gender }: { lean: Lean; pct: number; gen
   return (
     <div className="space-y-4">
       <div ref={ref} className="rounded-3xl overflow-hidden border border-slate-200 bg-white shadow-xl">
-        <div className={`p-6 md:p-8 ${lean==='egen'?'bg-gradient-to-r from-egen-50 to-white':'bg-gradient-to-r from-teto-50 to-white'}`}>
+        <div className="p-6 md:p-8">
           <div className="text-sm font-semibold text-slate-500">나의 테토/에겐 결과는…</div>
           <div className="text-3xl md:text-4xl font-extrabold mt-1" style={{color: copy.color}}>{copy.title}</div>
           <div className="text-slate-600 mt-1">{copy.subtitle}</div>
         </div>
+        <div className="px-6 md:px-8">
+          <ResultIllustration lean={lean} gender={gender} />
+        </div>
         <div className="p-6 md:p-8">
-          <Avatar type={lean} gender={gender} />
-          <div className="mt-5">
-            <div className="h-3 w-full rounded-full bg-slate-200 overflow-hidden">
-              <div className="h-full" style={{width:`${Math.abs(pct)}%`, background: copy.color}}/>
-            </div>
-            <div className="mt-2 text-sm font-semibold" style={{color: copy.color}}>{pct}%</div>
+          <div className="h-3 w-full rounded-full bg-slate-200 overflow-hidden">
+            <div className="h-full" style={{width:`${Math.abs(pct)}%`, background: copy.color}}/>
           </div>
+          <div className="mt-2 text-sm font-semibold" style={{color: copy.color}}>{pct}%</div>
           <div className="mt-5 flex flex-wrap gap-2">
             {copy.badges.map(b => (<span key={b} className="badge" style={{background: copy.color+'20', color: copy.color}}>{b}</span>))}
           </div>
@@ -50,13 +49,12 @@ export function ResultCard({ lean, pct, gender }: { lean: Lean; pct: number; gen
         </div>
       </div>
       <div className="flex gap-2">
-        <Button variant="outline" className="gap-2"><Share2 className="w-4 h-4" onClick={webShare}/>공유</Button>
-        <Button className={`gap-2 ${lean==='egen'?'bg-egen-500 hover:bg-egen-600':'bg-teto-500 hover:bg-teto-600'}`} onClick={capture}><Download className="w-4 h-4"/>결과 이미지 저장</Button>
+        <Button variant="outline" className="gap-2" onClick={webShare}><Share2 className="w-4 h-4"/>공유</Button>
+        <Button className="gap-2" onClick={capture}><Download className="w-4 h-4"/>결과 이미지 저장</Button>
       </div>
     </div>
   )
 }
-
 function List({title, items}:{title:string; items:string[]}){
   return (
     <div>
