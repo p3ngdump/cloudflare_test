@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { ResultCard } from '@/components/ResultCard'
 import { resultDict, Lean } from '@/data/results'
-import { RotateCcw, ChevronRight } from 'lucide-react'
+import { RotateCcw, ChevronRight, Sparkles } from 'lucide-react'
+import { GenderToggle, Gender } from '@/components/GenderToggle'
 
 const choices = [
   { label: '매우 아니다', value: 1 },
@@ -31,82 +32,82 @@ const rawQuestions = [
   { text: '연인의 기분 변화를 민감하게 살피는 편이다.', type: 'egen' },
   { text: '관계에서 과한 의존은 서로에게 부담이라고 느낀다.', type: 'teto' },
   { text: '몸이 힘들어도 연인의 부탁이면 웬만하면 들어주려 한다.', type: 'egen' },
-  { text: '혼자 보내는 시간이 충전의 핵심이라고 느낀다.', type: 'teto' },
+  { text: '혼자만의 시간이 충전의 핵심이라고 느낀다.', type: 'teto' },
   { text: '서운함을 쌓아두기보다 바로 표현하고 확인받고 싶다.', type: 'egen' },
   { text: '감정적 거리 두기가 있어야 건강한 관계가 유지된다고 본다.', type: 'teto' },
   { text: '데이트 계획을 세밀히 준비해 상대가 행복해하는 걸 좋아한다.', type: 'egen' },
   { text: '상대의 잦은 확인 요청이나 보고는 다소 피곤하다.', type: 'teto' },
 ] as const
 
-function mapScore(choiceValue: number){ return choiceValue - 3 } // -2..+2
-
-function computeLean(answers: Record<number, number>){
-  let sum=0
-  const answered = Object.keys(answers).length
-  rawQuestions.forEach((q, i) => {
-    const v = answers[i]; if(v==null) return
-    const base = mapScore(v)
-    const signed = q.type==='egen'? base : -base
-    sum += signed
-  })
+function mapScore(v:number){ return v-3 } // -2..+2
+function computeLean(answers:Record<number,number>){
+  let sum=0; const answered = Object.keys(answers).length
+  rawQuestions.forEach((q,i)=>{ const v=answers[i]; if(v==null) return; const base=mapScore(v); sum += q.type==='egen'? base: -base })
   const max = rawQuestions.length*2
-  const pct = answered ? Math.round((sum/max)*100) : 0 // -100..+100
-  const lean: Lean = pct > 5 ? 'egen' : pct < -5 ? 'teto' : 'neutral'
-  return { pct: Math.abs(pct), lean, answered }
+  const pctSigned = answered? Math.round((sum/max)*100) : 0
+  const lean: Lean = pctSigned>5 ? 'egen' : pctSigned<-5 ? 'teto' : 'neutral'
+  return { pct: Math.abs(pctSigned), lean, answered }
 }
 
 export default function App(){
-  const [gender, setGender] = useState<'male'|'female'|'none'>('none')
+  const [gender, setGender] = useState<Gender>('none')
   const [answers, setAnswers] = useState<Record<number, number>>({})
   const [submitted, setSubmitted] = useState(false)
   const { pct, lean, answered } = useMemo(()=>computeLean(answers), [answers])
-  const progress = Math.round((answered / rawQuestions.length) * 100)
+  const progress = Math.round((answered/rawQuestions.length)*100)
 
-  function setAnswer(i:number, v:number){ setAnswers(p => ({...p, [i]: v})) }
+  function setAnswer(i:number, v:number){ setAnswers(p=>({...p,[i]:v})) }
   function reset(){ setAnswers({}); setSubmitted(false); setGender('none') }
   function onSubmit(){
-    if(answered < rawQuestions.length){ alert('모든 문항에 응답해 주세요.'); return }
-    setSubmitted(true); setTimeout(() => document.getElementById('result')?.scrollIntoView({behavior:'smooth'}), 0)
+    if(answered<rawQuestions.length){ alert('모든 문항에 응답해 주세요.'); return }
+    setSubmitted(true); setTimeout(()=>document.getElementById('result')?.scrollIntoView({behavior:'smooth'}),0)
   }
 
   return (
-    <div className="min-h-screen p-4 md:p-8">
-      <div className="mx-auto max-w-4xl">
-        <motion.h1 initial={{opacity:0, y:12}} animate={{opacity:1, y:0}} className="text-3xl font-extrabold tracking-tight">
-          테토/에겐 연애 성향 테스트 <span className="text-slate-400">Pro</span>
-        </motion.h1>
-        <p className="text-slate-600 mt-2">20문항으로 에겐/테토 성향을 진단하고, 결과 이미지를 생성해 공유할 수 있어요.</p>
+    <div className="min-h-screen">
+      {/* HERO */}
+      <div className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-egen-50 via-white to-teto-50" />
+        <div className="relative mx-auto max-w-5xl px-4 py-10">
+          <motion.div initial={{opacity:0,y:12}} animate={{opacity:1,y:0}}>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border text-egen-600 border-egen-200 font-semibold shadow-sm">
+              <Sparkles className="w-4 h-4"/> 테토/에겐 연애 성향 테스트 V2
+            </div>
+            <h1 className="mt-3 text-4xl md:text-5xl font-extrabold tracking-tight">
+              핑크/블루 테마 & 귀여운 일러스트로 <br className="hidden md:block"/>내 연애 성향을 예쁘게 기록해요
+            </h1>
+            <p className="mt-3 text-slate-600">20문항에 답하고, 결과 이미지를 카드로 저장해 SNS에 공유해 보세요.</p>
+          </motion.div>
+        </div>
+      </div>
 
+      <div className="mx-auto max-w-4xl px-4 pb-14">
         <Card className="mt-6">
           <CardHeader><CardTitle>기본 정보</CardTitle></CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              <Button onClick={()=>setGender('male')}>남성 표시</Button>
-              <Button onClick={()=>setGender('female')}>여성 표시</Button>
-              <Button variant="outline" onClick={()=>setGender('none')}>표시 안 함</Button>
-            </div>
+            <GenderToggle value={gender} onChange={setGender} />
             <div className="flex items-center gap-3">
               <div className="text-sm text-slate-600">진행도</div>
-              <Progress value={progress} className="w-full" />
+              <Progress value={progress} color={lean==='egen'?'var(--pink)':lean==='teto'?'var(--blue)':'black'} />
               <div className="text-sm tabular-nums text-slate-600">{progress}%</div>
             </div>
           </CardContent>
         </Card>
 
         <form className="mt-6 space-y-4" onSubmit={(e)=>e.preventDefault()}>
-          {rawQuestions.map((q, i) => (
-            <Card key={i}>
+          {rawQuestions.map((q,i)=>(
+            <Card key={i} className="overflow-hidden">
               <CardContent className="p-5">
                 <div className="flex items-start gap-4">
                   <div className="text-slate-400 font-mono pt-1">{i+1}.</div>
                   <div className="flex-1">
                     <div className="font-medium leading-relaxed">{q.text}</div>
                     <div className="mt-3 grid grid-cols-2 sm:grid-cols-5 gap-2">
-                      {choices.map(c => (
-                        <Button key={c.value} type="button"
-                          variant={answers[i]===c.value? 'primary':'outline'}
+                      {choices.map(c=>(
+                        <Button key={c.value}
+                          variant={answers[i]===c.value ? (q.type==='egen'?'pink':'blue') : 'outline'}
                           className="w-full"
-                          onClick={()=>setAnswer(i, c.value)}>{c.label}</Button>
+                          onClick={()=>setAnswer(i,c.value)}>{c.label}</Button>
                       ))}
                     </div>
                   </div>
@@ -115,7 +116,9 @@ export default function App(){
             </Card>
           ))}
           <div className="flex gap-2 pt-2">
-            <Button onClick={onSubmit} className="gap-2">결과 보기 <ChevronRight className="w-4 h-4"/></Button>
+            <Button onClick={onSubmit} className={`gap-2 ${lean==='egen'?'bg-egen-500 hover:bg-egen-600':'bg-teto-500 hover:bg-teto-600'}`}>
+              결과 보기 <ChevronRight className="w-4 h-4"/>
+            </Button>
             <Button variant="outline" onClick={reset} className="gap-2"><RotateCcw className="w-4 h-4"/>다시 하기</Button>
           </div>
         </form>
