@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { cn } from './ui/utils'
-
 export type Gender = 'male'|'female'|'none'
 export function GenderToggle({value,onChange}:{value:Gender; onChange:(g:Gender)=>void}){
   return (

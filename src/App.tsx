@@ -4,9 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { ResultCard } from '@/components/ResultCard'
-import { resultDict, Lean } from '@/data/results'
 import { RotateCcw, ChevronRight } from 'lucide-react'
 import { GenderToggle, Gender } from '@/components/GenderToggle'
+import { computeScores, type Scores } from '@/data/engine'
 
 const choices = [
   { label: '매우 아니다', value: 1 },
@@ -17,49 +17,43 @@ const choices = [
 ] as const
 
 const rawQuestions = [
-  { text: '연인과는 자주 연락하며 하루의 일을 상세히 공유하고 싶다.', type: 'egen' },
-  { text: '연애를 하더라도 나만의 시간과 루틴은 반드시 지켜야 한다.', type: 'teto' },
-  { text: '갈등이 생기면 빨리 감정과 생각을 털어놓고 풀어야 속이 편하다.', type: 'egen' },
-  { text: '감정 과잉 표현은 관계에 오히려 방해가 될 수 있다고 본다.', type: 'teto' },
-  { text: '사소한 일이라도 연인의 칭찬과 확인이 큰 힘이 된다.', type: 'egen' },
-  { text: '중요한 결정을 내릴 때 타인보다 스스로의 판단을 우선한다.', type: 'teto' },
+  { text: '연인과는 자주 연락하며 하루의 일을 상세히 공유하고 싶다.', type: 'egen', style: 'expr' },
+  { text: '연애를 하더라도 나만의 시간과 루틴은 반드시 지켜야 한다.', type: 'teto', style: 'prag' },
+  { text: '갈등이 생기면 빨리 감정과 생각을 털어놓고 풀어야 속이 편하다.', type: 'egen', style: 'expr' },
+  { text: '감정 과잉 표현은 관계에 오히려 방해가 될 수 있다고 본다.', type: 'teto', style: 'prag' },
+  { text: '사소한 일이라도 연인의 칭찬과 확인이 큰 힘이 된다.', type: 'egen', style: 'expr' },
+  { text: '중요한 결정을 내릴 때 타인보다 스스로의 판단을 우선한다.', type: 'teto', style: 'prag' },
   { text: '서로의 일정이 달라도 가능한 한 시간을 맞추려 노력한다.', type: 'egen' },
   { text: '연애는 인생의 일부일 뿐, 다른 우선순위에 간섭받지 않길 원한다.', type: 'teto' },
-  { text: '사과와 애정 표현은 자주 해도 과하지 않다고 생각한다.', type: 'egen' },
-  { text: '연락 텀이 길어도 신뢰만 있다면 큰 문제는 아니라고 본다.', type: 'teto' },
-  { text: '기념일/행사에 정성을 들이는 편이다.', type: 'egen' },
-  { text: '문제가 생기면 감정보다 해결책과 실행을 먼저 생각한다.', type: 'teto' },
+  { text: '사과와 애정 표현은 자주 해도 과하지 않다고 생각한다.', type: 'egen', style: 'expr' },
+  { text: '연락 텀이 길어도 신뢰만 있다면 큰 문제는 아니라고 본다.', type: 'teto', style: 'prag' },
+  { text: '기념일/행사에 정성을 들이는 편이다.', type: 'egen', style: 'expr' },
+  { text: '문제가 생기면 감정보다 해결책과 실행을 먼저 생각한다.', type: 'teto', style: 'prag' },
   { text: '연인의 기분 변화를 민감하게 살피는 편이다.', type: 'egen' },
   { text: '관계에서 과한 의존은 서로에게 부담이라고 느낀다.', type: 'teto' },
   { text: '몸이 힘들어도 연인의 부탁이면 웬만하면 들어주려 한다.', type: 'egen' },
   { text: '혼자만의 시간이 충전의 핵심이라고 느낀다.', type: 'teto' },
-  { text: '서운함을 쌓아두기보다 바로 표현하고 확인받고 싶다.', type: 'egen' },
-  { text: '감정적 거리 두기가 있어야 건강한 관계가 유지된다고 본다.', type: 'teto' },
+  { text: '서운함을 쌓아두기보다 바로 표현하고 확인받고 싶다.', type: 'egen', style: 'expr' },
+  { text: '감정적 거리 두기가 있어야 건강한 관계가 유지된다고 본다.', type: 'teto', style: 'prag' },
   { text: '데이트 계획을 세밀히 준비해 상대가 행복해하는 걸 좋아한다.', type: 'egen' },
   { text: '상대의 잦은 확인 요청이나 보고는 다소 피곤하다.', type: 'teto' },
 ] as const
 
-function mapScore(v:number){ return v-3 }
-function computeLean(answers:Record<number,number>){
-  let sum=0; const answered = Object.keys(answers).length
-  rawQuestions.forEach((q,i)=>{ const v=answers[i]; if(v==null) return; const base=mapScore(v); sum += q.type==='egen'? base: -base })
-  const max = rawQuestions.length*2
-  const pctSigned = answered? Math.round((sum/max)*100) : 0
-  const lean: Lean = pctSigned>5 ? 'egen' : pctSigned<-5 ? 'teto' : 'neutral'
-  return { pct: Math.abs(pctSigned), lean, answered }
+function compute(answers:Record<number,number>): Scores {
+  return computeScores(answers as any, rawQuestions as any)
 }
 
 export default function App(){
   const [gender, setGender] = useState<Gender>('none')
   const [answers, setAnswers] = useState<Record<number, number>>({})
   const [submitted, setSubmitted] = useState(false)
-  const { pct, lean, answered } = useMemo(()=>computeLean(answers), [answers])
-  const progress = Math.round((answered/rawQuestions.length)*100)
+  const scores = useMemo(()=>compute(answers), [answers])
+  const progress = Math.round((Object.keys(answers).length/rawQuestions.length)*100)
 
   function setAnswer(i:number, v:number){ setAnswers(p=>({...p,[i]:v})) }
   function reset(){ setAnswers({}); setSubmitted(false); setGender('none') }
   function onSubmit(){
-    if(answered<rawQuestions.length){ alert('모든 문항에 응답해 주세요.'); return }
+    if(Object.keys(answers).length<rawQuestions.length){ alert('모든 문항에 응답해 주세요.'); return }
     setSubmitted(true); setTimeout(()=>document.getElementById('result')?.scrollIntoView({behavior:'smooth'}),0)
   }
 
@@ -68,10 +62,8 @@ export default function App(){
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-egen-50 via-white to-teto-50" />
         <div className="relative mx-auto max-w-5xl px-4 py-10">
-          <motion.div initial={{opacity:0,y:12}} animate={{opacity:1,y:0}}>
-            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">테토/에겐 연애 성향 테스트</h1>
-            <p className="mt-3 text-slate-600">20문항에 답하고, 결과 일러스트 카드로 저장해 보세요.</p>
-          </motion.div>
+          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">테토/에겐 연애 성향 테스트</h1>
+          <p className="mt-3 text-slate-600">20문항에 답하고, 16가지 이상 아키타입으로 결과를 확인해 보세요.</p>
         </div>
       </div>
 
@@ -117,7 +109,10 @@ export default function App(){
 
         {submitted && (
           <div id="result" className="mt-10">
-            <ResultCard lean={lean} pct={pct} gender={gender} />
+            <ResultCard scores={scores} gender={gender} />
+            <div className="grid-legend mt-2">
+              축A(관계): -100 테토 ← 0 → +100 에겐 · 축B(스타일): -100 실용 ← 0 → +100 표현
+            </div>
           </div>
         )}
 
