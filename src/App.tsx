@@ -89,7 +89,7 @@ export default function App() {
   }
   function shareResult() {
     const label = resultLabel
-    const text = `나의 연애 성향은: ${label} (점수 ${pct}% - ${leaning === 'egen' ? '에겐 기울기' : leaning === 'teto' ? '테토 기울기' : '중간'})`
+    const text = `나의 연애 성향은: ${label} (점수 ${pct}% - ${leaning === 'egen' ? '에겐 기울기' : '테토 기울기' : '중간'})`
     if (navigator.share) { navigator.share({ title: '테토/에겐 연애 성향 테스트', text }) }
     else { navigator.clipboard.writeText(text); alert('결과를 클립보드로 복사했어요!') }
   }
@@ -110,9 +110,9 @@ export default function App() {
             <div>
               <Label className="text-sm">표시 성별 (선택)</Label>
               <div className="mt-2 grid grid-cols-1 sm:grid-cols-3 gap-2">
-                <Button variant={gender === 'male' ? 'default' : 'outline'} onClick={() => setGender('male')}>남성</Button>
-                <Button variant={gender === 'female' ? 'default' : 'outline'} onClick={() => setGender('female')}>여성</Button>
-                <Button variant={gender === 'none' ? 'default' : 'outline'} onClick={() => setGender('none')}>선택 안 함</Button>
+                <Button onClick={() => setGender('male')}>남성</Button>
+                <Button onClick={() => setGender('female')}>여성</Button>
+                <Button variant="outline" onClick={() => setGender('none')}>선택 안 함</Button>
               </div>
               <p className="text-xs text-slate-500 mt-2">* 결과 레이블만 바뀌며, 점수 계산에는 영향을 주지 않습니다.</p>
             </div>
@@ -145,7 +145,7 @@ export default function App() {
                 <CardContent className="space-y-3">
                   <div className="text-xl font-semibold">{resultLabel}</div>
                   <div className="text-slate-600">{resultDesc}</div>
-                  <div className="text-sm text-slate-500">지표: {pct}% ({leaning === 'egen' ? '에겐 기울기' : leaning === 'teto' ? '테토 기울기' : '중간'})</div>
+                  <div className="text-sm text-slate-500">지표: {pct}% ({leaning === 'egen' ? '에겐 기울기' : '테토 기울기' : '중간'})</div>
                   <Alert>
                     <AlertTitle>해석 가이드</AlertTitle>
                     <AlertDescription>점수는 경향성을 나타내는 참고 지표입니다. 상황/맥락과 상대의 성향에 따라 달라질 수 있어요.</AlertDescription>
