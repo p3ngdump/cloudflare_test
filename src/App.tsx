@@ -22,14 +22,16 @@ function compute(answers:Record<number,number>): Scores {
 
 export default function App(){
   const [gender, setGender] = useState<Gender>('none')
+  const [nickname, setNickname] = useState<string>('')
   const [answers, setAnswers] = useState<Record<number, number>>({})
   const [submitted, setSubmitted] = useState(false)
   const scores = useMemo(()=>compute(answers), [answers])
   const progress = Math.round((Object.keys(answers).length/QUESTIONS.length)*100)
 
   function setAnswer(i:number, v:number){ setAnswers(p=>({...p,[i]:v})) }
-  function reset(){ setAnswers({}); setSubmitted(false); setGender('none') }
+  function reset(){ setAnswers({}); setSubmitted(false); setGender('none'); setNickname('') }
   function onSubmit(){
+    if (!nickname.trim()) { alert('별명을 입력해 주세요.'); return }
     if(Object.keys(answers).length<QUESTIONS.length){ alert('모든 문항에 응답해 주세요.'); return }
     setSubmitted(true); setTimeout(()=>document.getElementById('result')?.scrollIntoView({behavior:'smooth'}),0)
   }
@@ -49,6 +51,18 @@ export default function App(){
           <CardHeader><CardTitle>기본 정보</CardTitle></CardHeader>
           <CardContent className="space-y-4">
             <GenderToggle value={gender} onChange={setGender} />
+            <div>
+              <label className="block text-sm font-semibold mb-1">별명</label>
+              <input
+                value={nickname}
+                onChange={(e)=>setNickname(e.target.value)}
+                placeholder="예: 또리, 나나, 도치"
+                maxLength={20}
+                className="w-full rounded-xl border border-slate-300 px-3 py-2"
+              />
+              <div className="mt-1 text-xs text-slate-500">결과 화면에 “{nickname || '별명'}님의 결과는…” 으로 표시됩니다.</div>
+            </div>
+
             <div className="flex items-center gap-3">
               <div className="text-sm text-slate-600">진행도</div>
               <Progress value={progress} />
@@ -86,7 +100,7 @@ export default function App(){
 
         {submitted && (
           <div id="result" className="mt-10">
-            <ResultCard scores={scores} gender={gender} />
+            <ResultCard scores={scores} gender={gender} nickname={nickname.trim()} />
             <div className="small mt-2">
               메인: -100 테토 ← 0 → +100 에겐 · 스타일: -100 실용 ← 0 → +100 표현
             </div>
