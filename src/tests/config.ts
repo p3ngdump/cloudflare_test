@@ -48,5 +48,5 @@ export const QUESTIONS: Q[] = [
   { text: '갈등 상황에서도 유머로 분위기를 환기한다.', tags: ['expr','avoid'] },
   { text: '계획표를 공유하고 역할을 나누는 걸 선호한다.', tags: ['plan','sol'] },
   { text: '연락은 짧고 간결하게 보내는 편이다.', tags: ['prag'] },
-  { text: '이성보다 감정이 우선일 때가 많다.', tags: ['emo','egen'] }
+  { text: '데이터보다 감정이 우선일 때가 많다.', tags: ['emo','egen'] }
 ]

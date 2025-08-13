@@ -1,13 +1,8 @@
 import * as React from 'react'
-import tetoMale from '@/assets/illustrations/teto_male.png'
-import tetoFemale from '@/assets/illustrations/teto_female.png'
-import egenMale from '@/assets/illustrations/egen_male.png'
-import egenFemale from '@/assets/illustrations/egen_female.png'
-import neutralImg from '@/assets/illustrations/neutral.png'
-
-export default function ResultIllustration({ side, gender }:{ side:'egen'|'teto'; gender:'male'|'female'|'none' }){
-  let src = neutralImg
-  if(side==='egen') src = gender==='female'? egenFemale : egenMale
-  if(side==='teto') src = gender==='female'? tetoFemale : tetoMale
-  return <img src={src} alt="result-illustration" className="w-full rounded-2xl border border-slate-200" />
+export default function ResultIllustration(){
+  return (
+    <div className="h-40 rounded-2xl bg-gradient-to-r from-egen-100 to-teto-100 border border-slate-200 flex items-center justify-center text-slate-500 text-sm">
+      (일러스트 영역 — 이미지 없이 동작)
+    </div>
+  )
 }

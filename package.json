@@ -1,7 +1,7 @@
 {
-  "name": "teto-egen-relationship-test-32",
+  "name": "teto-egen-32-details",
   "private": true,
-  "version": "6.2.1",
+  "version": "2.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",

@@ -6,7 +6,7 @@ import { ResultCard } from '@/components/ResultCard'
 import { RotateCcw, ChevronRight } from 'lucide-react'
 import { GenderToggle, Gender } from '@/components/GenderToggle'
 import { QUESTIONS, type Q } from '@/tests/config'
-import { computeScores, type Scores } from '@/data/engine'
+import { compute } from '@/data/engine'
 
 const choices = [
   { label: '매우 아니다', value: 1 },
@@ -16,22 +16,18 @@ const choices = [
   { label: '매우 그렇다', value: 5 },
 ] as const
 
-function compute(answers:Record<number,number>): Scores {
-  return computeScores(answers as any, QUESTIONS as any)
-}
-
 export default function App(){
   const [gender, setGender] = useState<Gender>('none')
-  const [nickname, setNickname] = useState<string>('')
+  const [nickname, setNickname] = useState('')
   const [answers, setAnswers] = useState<Record<number, number>>({})
   const [submitted, setSubmitted] = useState(false)
-  const scores = useMemo(()=>compute(answers), [answers])
+  const computed = useMemo(()=>compute(answers, QUESTIONS), [answers])
   const progress = Math.round((Object.keys(answers).length/QUESTIONS.length)*100)
 
   function setAnswer(i:number, v:number){ setAnswers(p=>({...p,[i]:v})) }
   function reset(){ setAnswers({}); setSubmitted(false); setGender('none'); setNickname('') }
   function onSubmit(){
-    if (!nickname.trim()) { alert('별명을 입력해 주세요.'); return }
+    if(!nickname.trim()){ alert('별명을 입력해 주세요.'); return }
     if(Object.keys(answers).length<QUESTIONS.length){ alert('모든 문항에 응답해 주세요.'); return }
     setSubmitted(true); setTimeout(()=>document.getElementById('result')?.scrollIntoView({behavior:'smooth'}),0)
   }
@@ -42,7 +38,7 @@ export default function App(){
         <div className="absolute inset-0 bg-gradient-to-br from-egen-50 via-white to-teto-50" />
         <div className="relative mx-auto max-w-5xl px-4 py-10">
           <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">테토/에겐 연애 성향 테스트</h1>
-          <p className="mt-3 text-slate-600">40문항으로 메인 축 기반 <b>32타입</b>과 보조 인사이트 3개를 확인해 보세요.</p>
+          <p className="mt-3 text-slate-600">40문항으로 메인 축 기반 <b>32타입</b>을 확인하고, 요약 3줄 후 토글로 자세한 내용을 펼쳐보세요.</p>
         </div>
       </div>
 
@@ -56,7 +52,7 @@ export default function App(){
               <input
                 value={nickname}
                 onChange={(e)=>setNickname(e.target.value)}
-                placeholder="예: 또리, 나나, 도치"
+                placeholder="예: 나나, 도치, 홍길동"
                 maxLength={20}
                 className="w-full rounded-xl border border-slate-300 px-3 py-2"
               />
@@ -81,10 +77,11 @@ export default function App(){
                     <div className="font-medium leading-relaxed">{q.text}</div>
                     <div className="mt-3 grid grid-cols-2 sm:grid-cols-5 gap-2">
                       {choices.map(c=>(
-                        <Button key={c.value}
-                          variant={answers[i]===c.value ? 'solid':'outline'}
-                          className="w-full"
-                          onClick={()=>setAnswer(i,c.value)}>{c.label}</Button>
+                        <button key={c.value}
+                          className={'rounded-xl px-3 py-2 text-sm border ' + (answers[i]===c.value
+                            ? 'bg-black text-white border-black'
+                            : 'bg-white text-slate-800 border-slate-300 hover:bg-slate-50')}
+                          onClick={()=>setAnswer(i,c.value)}>{c.label}</button>
                       ))}
                     </div>
                   </div>
@@ -93,14 +90,20 @@ export default function App(){
             </Card>
           ))}
           <div className="flex gap-2 pt-2">
-            <Button onClick={onSubmit} className="gap-2">결과 보기 <ChevronRight className="w-4 h-4"/></Button>
-            <Button variant="outline" onClick={reset} className="gap-2"><RotateCcw className="w-4 h-4"/>다시 하기</Button>
+            <button onClick={onSubmit} className="rounded-xl px-4 py-2 bg-black text-white font-semibold">결과 보기 <span className='inline-block ml-1'>→</span></button>
+            <button onClick={reset} className="rounded-xl px-4 py-2 border border-slate-300 bg-white font-semibold">다시 하기</button>
           </div>
         </form>
 
         {submitted && (
           <div id="result" className="mt-10">
-            <ResultCard scores={scores} gender={gender} nickname={nickname.trim()} />
+            <ResultCard
+              side={computed.side}
+              intensity={computed.intensity}
+              style={computed.style}
+              pctDisplay={computed.pctDisplay}
+              nickname={nickname.trim()}
+            />
             <div className="small mt-2">
               메인: -100 테토 ← 0 → +100 에겐 · 스타일: -100 실용 ← 0 → +100 표현
             </div>
