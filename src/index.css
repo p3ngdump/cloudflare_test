@@ -7,3 +7,4 @@ body { @apply bg-slate-50; }
 .badge { @apply px-2.5 py-1 rounded-full text-xs font-semibold; }
 .small { @apply text-[11px] text-slate-400; }
 .section { @apply rounded-3xl border border-slate-200 bg-white shadow-sm; }
+.summary { @apply text-sm text-slate-700 leading-6; }

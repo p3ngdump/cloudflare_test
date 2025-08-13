@@ -14,11 +14,11 @@ export function ResultCard({ scores, gender }: { scores: Scores; gender: 'male'|
     if(!ref.current) return
     const canvas = await html2canvas(ref.current as HTMLElement, {backgroundColor: '#ffffff', scale: 2})
     const url = canvas.toDataURL('image/png')
-    const a = document.createElement('a'); a.href = url; a.download = `teto-egen-v6-${profile.key}.png`; a.click()
+    const a = document.createElement('a'); a.href = url; a.download = `teto-egen-32-${profile.key}.png`; a.click()
   }
   function webShare(){
-    const text = `나의 메인 타입: ${profile.title} (${scores.pctDisplay}%)`
-    if(navigator.share){ navigator.share({title:'메가 성향 테스트 v6', text}) }
+    const text = `내 타입: ${profile.title} (${scores.pctDisplay}%)`
+    if(navigator.share){ navigator.share({title:'테토/에겐 연애 성향 테스트', text}) }
     else { navigator.clipboard.writeText(text); alert('결과 텍스트를 복사했어요!') }
   }
   return (
@@ -30,13 +30,17 @@ export function ResultCard({ scores, gender }: { scores: Scores; gender: 'male'|
           <div className="text-slate-600 mt-1">{profile.subtitle}</div>
         </div>
         <div className="px-6 md:px-8">
-          <ResultIllustration lean={scores.lean} gender={gender} />
+          <ResultIllustration side={scores.side} gender={gender} />
         </div>
         <div className="p-6 md:p-8">
           <div className="h-3 w-full rounded-full bg-slate-200 overflow-hidden">
             <div className="h-full" style={{width:`${Math.abs(scores.pctDisplay)}%`, background: profile.color}}/>
           </div>
           <div className="mt-2 text-sm font-semibold" style={{color: profile.color}}>{scores.pctDisplay}%</div>
+
+          <ul className="summary mt-4 list-disc pl-5">
+            {profile.summary.map((s,i)=>(<li key={i}>{s}</li>))}
+          </ul>
 
           <div className="mt-5 flex flex-wrap gap-2">
             {profile.badges.map(b => (<span key={b} className="badge" style={{background: profile.color+'20', color: profile.color}}>{b}</span>))}

@@ -39,8 +39,8 @@ export default function App(){
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-egen-50 via-white to-teto-50" />
         <div className="relative mx-auto max-w-5xl px-4 py-10">
-          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">메가 성향 테스트 v6</h1>
-          <p className="mt-3 text-slate-600">40문항으로 메인 타입(16+)과 보조 인사이트 3개를 확인해 보세요.</p>
+          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">테토/에겐 연애 성향 테스트</h1>
+          <p className="mt-3 text-slate-600">40문항으로 메인 축 기반 <b>32타입</b>과 보조 인사이트 3개를 확인해 보세요.</p>
         </div>
       </div>
 
@@ -93,7 +93,7 @@ export default function App(){
           </div>
         )}
 
-        <footer className="text-xs text-slate-400 mt-10">© 2025 Mega Test v6 · 오락/자가 인식 목적의 비진단 도구</footer>
+        <footer className="text-xs text-slate-400 mt-10">© 2025 테토/에겐 연애 성향 테스트 · 오락/자가 인식 목적의 비진단 도구</footer>
       </div>
     </div>
   )

@@ -1,12 +1,13 @@
 import * as React from 'react'
-import EgenMale from '@/illustrations/EgenMale'
-import EgenFemale from '@/illustrations/EgenFemale'
-import TetoMale from '@/illustrations/TetoMale'
-import TetoFemale from '@/illustrations/TetoFemale'
-import Neutral from '@/illustrations/Neutral'
+import tetoMale from '@/assets/illustrations/teto_male.png'
+import tetoFemale from '@/assets/illustrations/teto_female.png'
+import egenMale from '@/assets/illustrations/egen_male.png'
+import egenFemale from '@/assets/illustrations/egen_female.png'
+import neutralImg from '@/assets/illustrations/neutral.png'
 
-export default function ResultIllustration({ lean, gender }:{ lean:'egen'|'teto'|'neutral'; gender:'male'|'female'|'none' }){
-  if(lean==='egen') return gender==='female'? <EgenFemale/> : <EgenMale/>
-  if(lean==='teto') return gender==='female'? <TetoFemale/> : <TetoMale/>
-  return <Neutral/>
+export default function ResultIllustration({ side, gender }:{ side:'egen'|'teto'; gender:'male'|'female'|'none' }){
+  let src = neutralImg
+  if(side==='egen') src = gender==='female'? egenFemale : egenMale
+  if(side==='teto') src = gender==='female'? tetoFemale : tetoMale
+  return <img src={src} alt="result-illustration" className="w-full rounded-2xl border border-slate-200" />
 }

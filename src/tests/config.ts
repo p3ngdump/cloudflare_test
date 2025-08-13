@@ -7,9 +7,7 @@ export type Tag =
   | 'frugal' | 'flex'
   | 'calm' | 'active'
   | 'duo' | 'group'
-
 export type Q = { text: string; tags: Tag[] }
-
 export const QUESTIONS: Q[] = [
   { text: '연인과는 자주 연락하며 하루의 일을 자세히 공유하고 싶다.', tags: ['egen','expr'] },
   { text: '연애를 하더라도 나만의 루틴은 지키고 싶다.', tags: ['teto','prag'] },

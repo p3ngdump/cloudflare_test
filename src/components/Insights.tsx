@@ -1,5 +1,4 @@
 import * as React from 'react'
-
 export function InsightRow({title, value, left, right}:{title:string; value:number; left:string; right:string}){
   const pct=(value+100)/2
   return (
@@ -14,7 +13,6 @@ export function InsightRow({title, value, left, right}:{title:string; value:numb
     </div>
   )
 }
-
 export function Insights3({conflict, planner, spending}:{conflict:{approach:number,focus:number}, planner:number, spending:number}){
   return (
     <div className="grid md:grid-cols-3 gap-4">

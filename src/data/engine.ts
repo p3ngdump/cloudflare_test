@@ -1,11 +1,11 @@
 import type { Q, Tag } from '@/tests/config'
-import { buildMainProfile, type Lean, type Style } from './profiles'
+import { buildMainProfile32, type LeanSide, type Style } from './profiles'
 
 export type Scores = {
   axisMain: number
   axisStyle: number
   pctDisplay: number
-  lean: Lean
+  side: LeanSide
   intensity: 0|1|2|3
   style: Style
   aux: {
@@ -16,7 +16,6 @@ export type Scores = {
     social: number
   }
 }
-
 const weight = (tag: Tag) => ({
   egen: +1, teto: -1,
   expr: +1, prag: -1,
@@ -27,11 +26,9 @@ const weight = (tag: Tag) => ({
   active: +1, calm: -1,
   group: +1, duo: -1
 } as Record<Tag, number>)[tag]
-
 export function computeScores(answers: Record<number, number>, questions: Q[]): Scores {
   let main=0, style=0, mainMax=0, styleMax=0
   const aux = { approach:0, approachMax:0, focus:0, focusMax:0, planner:0, plannerMax:0, spending:0, spendingMax:0, energy:0, energyMax:0, social:0, socialMax:0 }
-
   questions.forEach((q, i) => {
     const v = answers[i]; if (v==null) return
     const base = (v - 3)
@@ -47,32 +44,23 @@ export function computeScores(answers: Record<number, number>, questions: Q[]): 
       if (t==='group' || t==='duo'){ aux.social += base*w; aux.socialMax += 2 }
     })
   })
-
-  const norm = (sum:number,max:number)=> max? Math.round(sum/max*100):0
+  const norm = (s:number,m:number)=> m? Math.round(s/m*100):0
   const axisMain = norm(main, mainMax)
   const axisStyle = norm(style, styleMax)
-
-  const lean: Lean = axisMain>5? 'egen' : axisMain<-5 ? 'teto':'neutral'
+  let side: LeanSide = axisMain>5? 'egen' : axisMain<-5 ? 'teto' : (axisStyle>=0 ? 'egen' : 'teto')
   const absA = Math.abs(axisMain)
   const intensity: 0|1|2|3 = absA>=75?3: absA>=50?2: absA>=25?1:0
-  const styleType: Style =
-    axisStyle>=50? 'expressive' :
-    axisStyle>=10? 'warm' :
-    axisStyle<=-50? 'pragmatic' : 'balanced'
-
+  const styleType: Style = axisStyle>=50? 'expressive' : axisStyle>=10? 'warm' : axisStyle<=-50? 'pragmatic' : 'balanced'
   const pctDisplay = Math.min(100, Math.round(Math.abs(axisMain) * 1.25))
-
-  const auxOut = {
-    conflict: { approach: norm(aux.approach, aux.approachMax), focus: norm(aux.focus, aux.focusMax) },
-    planner: norm(aux.planner, aux.plannerMax),
-    spending: norm(aux.spending, aux.spendingMax),
-    energy: norm(aux.energy, aux.energyMax),
-    social: norm(aux.social, aux.socialMax)
+  return {
+    axisMain, axisStyle, pctDisplay, side, intensity, style: styleType,
+    aux: {
+      conflict: { approach: norm(aux.approach, aux.approachMax), focus: norm(aux.focus, aux.focusMax) },
+      planner: norm(aux.planner, aux.plannerMax),
+      spending: norm(aux.spending, aux.spendingMax),
+      energy: norm(aux.energy, aux.energyMax),
+      social: norm(aux.social, aux.socialMax)
+    }
   }
-
-  return { axisMain, axisStyle, pctDisplay, lean, intensity, style: styleType, aux: auxOut }
 }
-
-export function buildProfile(scores: Scores){
-  return buildMainProfile(scores.lean, scores.intensity, scores.style)
-}
+export function buildProfile(scores: Scores){ return buildMainProfile32(scores.side, scores.intensity, scores.style) }
